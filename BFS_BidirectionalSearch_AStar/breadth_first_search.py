@@ -8,27 +8,26 @@ def breadth_first_search(problem):
     classes) and provides a valid and optimal path from the initial state to the goal state. Useful for testing your
     bidirectional and A* search algorithms.
 
-    :param problem: instance of SimpleSearchProblem #TODO: GraphSearchProblem
+    :param problem: instance of GraphSearchProblem
     :return: path: a list of states (ints) describing the path from problem.init_state to problem.goal_state[0]
              num_nodes_expanded: number of nodes expanded by your search
              max_frontier_size: maximum frontier size during search
     """
-    
-    max_frontier_size = 0
-    num_nodes_expanded = 0
-    path = []
-
     #check if we start at the goal
     if problem.init_state == problem.goal_states[0]:
         return [problem.init_state], 0, 1
 
     # initialization
     q = deque()     #FIFO queue for BFS, this will hold all of the nodes to be explored
-    visited = []    #all visited nodes
-    # problem.V.shape[0] is the number of nodes
-    parents = {node:False for node in problem.V}  #parents will hold the previous node      
+    visited = set() #all visited nodes
+                    # problem.V.shape[0] is the number of nodes
+    max_frontier_size = 0   #return values
+    num_nodes_expanded = 0
+    path = []
+    parents = {}  #parents will hold the previous node
+        #key = current node, value = parent of the key      
     # initialize all parents to be False
-    q.append(problem.init_state) #start by exploring the initial node
+    q.append(problem.init_state)#start by exploring the initial node
 
     while len(q)!=0:
         # keep looping until the queue is empty
@@ -37,10 +36,7 @@ def breadth_first_search(problem):
             # curr is an integer! The current state
         if curr == problem.goal_states[0]:
             ## reached the goal node
-            # work backwards from the goal to obtain path from the
-            # parent nodes, then reverse path
             break
-            #return path, num_nodes_expanded, max_frontier_size
         # otherwise, we can look at all of its neighbors
         #get_actions: returns list of tuples corresponding to edges connected to state
         for i in problem.get_actions(curr): 
@@ -48,13 +44,19 @@ def breadth_first_search(problem):
             if i[1] in visited:
                 # if we have already explored the node before
                 continue
-            q.append(i[1])          #queue this unexplored node
-            parents[i[1]] = curr    #set the parent of the node to be explored
-            visited.append(i[1])
+            q.append(i[1])          # queue this unexplored node
+            parents[i[1]] = curr    # set the parent of the node to be explored
+            visited.add(i[1])       # append the nodes to the visited set
+
         #finished exploring the current node
         num_nodes_expanded = num_nodes_expanded+1
-        #visited.append(curr)
 
+    # check if we broke out of the loop since goal was reached
+    if curr != problem.goal_states[0]:
+        return [], num_nodes_expanded, max_frontier_size
+    
+    # work backwards from the goal to obtain path from the
+    # parent nodes, then reverse path
     path.append(curr) 
     while curr != problem.init_state:
         #loop until we get to the first node again
