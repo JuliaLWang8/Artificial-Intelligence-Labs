@@ -33,8 +33,8 @@ def bidirectional_search(problem):
     # adding the starting nodes to the queues
     qforward.append(problem.init_state)
     qback.append(problem.goal_states[0])
-    parentsf[problem.init_state] = [True, 0]
-    parentsb[problem.goal_states[0]] = [True, 0]
+    # parentsf[problem.init_state] = [True, 0]
+    # parentsb[problem.goal_states[0]] = [True, 0]
 
     # explore in forwards and backwards directions using bfs 1 level at a time
     while len(qforward)!=0 and len(qback)!=0:
@@ -85,16 +85,14 @@ def findpath(p1, p2, mid, problem):
     curr=mid
     # working from middle to the initial
     while curr != problem.init_state:
-        # print(path)
         path.append(p1[curr])
         curr = p1[curr]
     path = path[::-1] #reversing it
-    # print("halfway")
+    
+    # going the other direction for the second half
     curr = mid
     path.append(curr) # add the meeting node
-    # print(p2[curr][0])
     while curr != problem.goal_states[0]:
-        # print(path)
         path.append(p2[curr])
         curr=p2[curr]
     return path
@@ -108,30 +106,28 @@ def explorelevel(problem, q, v, p, n, q2, v2):
         outputs: q_out updated queue, v visited, p parents, and n number of nodes
                 found = intersected node if it is found, False otherwise
     """
-    q_out = deque()     #initializing output queue with children
-    #print("running explorelevel")
-    curr = q.popleft() #get the first node in the queue
-    q.appendleft(curr) # append it back on so we can pop it in the loop
+    q_out = deque()     #initializing output queue
+    # will hold the next instance of the queue after exploring current level
 
     while len(q)!=0:
         #print("current level is", level)
-        # want to check all of the other nodes in that level 
+        # want to check all of the other nodes in that level
+        # all the nodes in the current level are all in the queue
         curr = q.popleft()      # update current node
-        # if p[curr][1] != level: # if we hit a new level, break
-        #     break
-        n= n+1
+        n= n+1                  # update number of nodes we've explored
         for i in problem.get_actions(curr):
-            if i[1] in v or i[1] in q_out: 
-                #node has already been explored or is in the queue
+            if i[1] in v: 
+                #node has already been explored if it's in visited
                 continue
             elif curr in v2 or curr in q2:
                 #node is in the visited set of the other direction
+                # or in the queue => intersection found
                 return q_out, v, p, n, curr
             else:
                 # else, node hasnt been discovered
                 q_out.append(i[1])  # add it to the queue
                 p[i[1]]= curr       # update its parent
-                v.add(curr)         # add the node into the visited set
+                v.add(i[1])         # add the node into the visited set
 
     return q_out, v, p, n, False
 
