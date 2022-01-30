@@ -23,7 +23,7 @@ def a_star_search(problem):
     visited = set()               # consists of nodes that have been explored
     q = queue.PriorityQueue()     # priority queue with nodes to explore next
         # each element in the queue is a tuple (priority, node)
-    parents = {}      # key= node, value= [predecessor, associated cost = g+h]
+    parents = {}      # key= node, value= [predecessor, associated g cost]
 
     # starting with the initial node
     q.put((0, problem.init_state))
@@ -31,25 +31,31 @@ def a_star_search(problem):
 
     while q.empty() is False:
         # while there are nodes in the queue to be explored
-        curr= q.get()
+        curr = q.get()[1]
         if curr == problem.goal_states[0]:
             # found the goal
             break
+        if curr in visited:
+            continue
         for i in problem.get_actions(curr):
-            # calculate its A* cost = (path cost of its parent + 1) + heuristic function
-            cost = parents[curr][1]+1 + problem.heuristic(i[1])
+            # calculate its g cost = g cost of its parent + 1
+            g = parents[curr][1]+1
             if i[1] in parents:
                 # if it has been in parents, update it to have the minimum cost parent
-                if cost < parents[i[1]][1]:
+                if g < parents[i[1]][1]:
                     # current cost is less than previous
-                    parents[i[1]]= [curr, cost]
+                    parents[i[1]]= [curr, g]
                 # otherwise, its cost is higher and we go with the previous parent
+            else:
+                # if it isn't in parents, give it the current cost
+                parents[i[1]] = [curr, g]
             
             if i[1] in visited:
                 # we have already explored the node
                 continue
-            q.put((parents[i[1]][1], i[1]))    # add the unexplored node to the queue
-        
+            # add it to the queue with A* priority f = g cost + heuristic cost
+            q.put((parents[i[1]][1]+problem.heuristic(i[1]), i[1]))    # add the unexplored node to the queue
+
         # we have fully explored the current node
         visited.add(curr)                   # add current node to visited
         num_nodes_expanded+=1               # increment # of nodes expanded
@@ -72,7 +78,6 @@ def a_star_search(problem):
     path = path[::-1]                  #reverse path when done
 
     return path, num_nodes_expanded, max_frontier_size
-
 
 def search_phase_transition():
     """
@@ -98,7 +103,6 @@ if __name__ == '__main__':
     M = 10
     N = 10
     problem = get_random_grid_problem(p_occ, M, N)
-    print(problem.get_actions(1))
     # Solve it
     path, num_nodes_expanded, max_frontier_size = a_star_search(problem)
     # Check the result
