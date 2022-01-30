@@ -87,12 +87,9 @@ def search_phase_transition():
 
     :return: tuple containing (transition_start_probability, transition_end_probability, peak_probability)
     """
-    ####
-    #   REPLACE THESE VALUES
-    ####
-    transition_start_probability = -1.0
-    transition_end_probability = -1.0
-    peak_nodes_expanded_probability = -1.0
+    transition_start_probability = 0.3
+    transition_end_probability = 0.44
+    peak_nodes_expanded_probability = 0.45
     return transition_start_probability, transition_end_probability, peak_nodes_expanded_probability
 
 
