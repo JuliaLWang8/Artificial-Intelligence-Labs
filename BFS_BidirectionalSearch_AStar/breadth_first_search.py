@@ -50,6 +50,10 @@ def breadth_first_search(problem):
 
         #finished exploring the current node
         num_nodes_expanded = num_nodes_expanded+1
+        
+        # update max frontier size if necessary
+        if len(q)>max_frontier_size:
+            max_frontier_size= len(q)
 
     # check if we broke out of the loop since goal was reached
     if curr != problem.goal_states[0]:
